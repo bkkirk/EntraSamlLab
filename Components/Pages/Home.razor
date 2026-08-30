@@ -1,0 +1,75 @@
+@page "/"
+@inject IOptions<SamlOptions> SamlOptionsAccessor
+
+<PageTitle>Overview | Entra SAML Lab</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow accent">Overview</p>
+        <h1>Welcome to Entra SAML Lab</h1>
+        <p class="page-intro">A controlled workspace for validating your Microsoft Entra ID SAML 2.0 service provider integration.</p>
+    </div>
+    <span class="status-badge status-badge-muted"><span class="status-dot"></span> Not connected</span>
+</div>
+
+<section class="hero-panel">
+    <div class="hero-copy">
+        <span class="hero-kicker">Service provider lab</span>
+        <h2>@SamlOptionsAccessor.Value.ApplicationName</h2>
+        <p>Prepare, inspect, and validate the protocol details that connect your application to Microsoft Entra ID.</p>
+        <button class="button button-primary" type="button" disabled title="SAML authentication will be configured in a future step">
+            Sign in with Microsoft Entra ID
+            <span aria-hidden="true">→</span>
+        </button>
+        <span class="button-note">Authentication is not configured yet</span>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="orbit-core">E</div>
+        <span class="orbit-node node-one"></span>
+        <span class="orbit-node node-two"></span>
+        <span class="orbit-node node-three"></span>
+    </div>
+</section>
+
+<div class="section-heading">
+    <div>
+        <p class="eyebrow">Readiness</p>
+        <h2>Connection snapshot</h2>
+    </div>
+    <a class="text-link" href="/configuration">View configuration <span aria-hidden="true">↗</span></a>
+</div>
+
+<div class="dashboard-grid">
+    <section class="info-card">
+        <div class="card-header">
+            <div class="card-icon icon-violet" aria-hidden="true">◆</div>
+            <span class="status-badge status-badge-muted">Pending</span>
+        </div>
+        <p class="card-label">Authentication status</p>
+        <h3>Not Authenticated</h3>
+        <p class="card-description">No active ClaimsPrincipal is available in this session.</p>
+    </section>
+
+    <section class="info-card">
+        <div class="card-header">
+            <div class="card-icon icon-cyan" aria-hidden="true">◎</div>
+            <span class="status-badge status-badge-muted">Awaiting setup</span>
+        </div>
+        <p class="card-label">SAML service provider</p>
+        <h3>Not configured</h3>
+        <p class="card-description">Entity ID, ACS, and metadata values will appear here when configured.</p>
+    </section>
+
+    <section class="info-card info-card-wide">
+        <div class="card-header">
+            <div class="card-icon icon-amber" aria-hidden="true">▣</div>
+            <span class="status-badge status-badge-ready">Ready for setup</span>
+        </div>
+        <p class="card-label">Next step</p>
+        <h3>Configure your SAML connection</h3>
+        <p class="card-description">Add non-secret service provider and identity provider values through application configuration before wiring the SAML middleware.</p>
+        <a class="card-action" href="/configuration">Open configuration <span aria-hidden="true">→</span></a>
+    </section>
+</div>

@@ -1,0 +1,80 @@
+@page "/saml-status"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IOptions<SamlOptions> SamlOptionsAccessor
+
+<PageTitle>SAML Status | Entra SAML Lab</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow accent">Diagnostics</p>
+        <h1>SAML status</h1>
+        <p class="page-intro">Inspect the current authentication session and the service provider connection details.</p>
+    </div>
+    <span class="status-badge status-badge-muted"><span class="status-dot"></span> Not authenticated</span>
+</div>
+
+<div class="status-layout">
+    <section class="panel panel-primary-status">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Session</p>
+                <h2>Authentication status</h2>
+            </div>
+            <div class="large-status-icon" aria-hidden="true">◌</div>
+        </div>
+        <div class="status-callout">
+            <span class="status-ring"></span>
+            <div>
+                <strong>@AuthenticationLabel</strong>
+                <p>No SAML session has been established.</p>
+            </div>
+        </div>
+        <dl class="detail-list">
+            <div><dt>Current signed-in user</dt><dd>@CurrentUser</dd></div>
+            <div><dt>Authentication time</dt><dd>@AuthenticationTime</dd></div>
+            <div><dt>Authentication protocol</dt><dd>SAML 2.0</dd></div>
+        </dl>
+    </section>
+
+    <section class="panel">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Connection</p>
+                <h2>Service provider</h2>
+            </div>
+            <span class="status-badge status-badge-muted">Pending</span>
+        </div>
+        <dl class="detail-list">
+            <div><dt>Identity provider</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)</dd></div>
+            <div><dt>Service provider Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.EntityId)</dd></div>
+            <div><dt>Assertion Consumer Service URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)</dd></div>
+            <div><dt>SAML connection status</dt><dd><span class="inline-status"><span class="status-dot"></span> Not configured</span></dd></div>
+        </dl>
+    </section>
+</div>
+
+@code {
+    private string AuthenticationLabel = "Not Authenticated";
+    private string CurrentUser = "None";
+    private string AuthenticationTime = "Not available";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            AuthenticationLabel = "Authenticated";
+            CurrentUser = user.Identity.Name ?? user.FindFirst("name")?.Value ?? "Signed-in user";
+
+            var authTime = user.FindFirst("auth_time")?.Value;
+            AuthenticationTime = long.TryParse(authTime, out var unixTime)
+                ? DateTimeOffset.FromUnixTimeSeconds(unixTime).ToLocalTime().ToString("MMM d, yyyy · h:mm tt")
+                : "Available from session";
+        }
+    }
+
+    private static string DisplayValue(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "Not configured" : value;
+}

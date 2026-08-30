@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <NavMenu />
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Service provider workspace</p>
+                <p class="topbar-title">Microsoft Entra ID / SAML 2.0</p>
+            </div>
+            <div class="environment-pill">
+                <span class="status-dot"></span>
+                Lab environment
+            </div>
+        </header>
+
+        <article class="content-area">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    <span>An unexpected error has occurred.</span>
+    <a href="" class="reload">Reload</a>
+    <button type="button" class="dismiss" aria-label="Dismiss">×</button>
+</div>

@@ -1,0 +1,47 @@
+@page "/configuration"
+@inject IOptions<SamlOptions> SamlOptionsAccessor
+
+<PageTitle>Configuration | Entra SAML Lab</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow accent">Environment</p>
+        <h1>Configuration</h1>
+        <p class="page-intro">Review the public, non-secret values used to describe this SAML connection.</p>
+    </div>
+    <span class="status-badge status-badge-ready"><span class="status-dot"></span> Non-secret values</span>
+</div>
+
+<section class="panel configuration-panel">
+    <div class="panel-heading">
+        <div>
+            <p class="eyebrow">Application settings</p>
+            <h2>SAML configuration</h2>
+        </div>
+        <span class="config-source">appsettings.json · Saml</span>
+    </div>
+    <p class="panel-intro">These values are read from the <code>Saml</code> configuration section. Secrets, certificates, private keys, and tenant-specific credentials are intentionally excluded from this base application.</p>
+
+    <div class="config-grid">
+        <ConfigRow Label="Application name" Value="@SamlOptionsAccessor.Value.ApplicationName" />
+        <ConfigRow Label="Public base URL" Value="@DisplayValue(SamlOptionsAccessor.Value.PublicBaseUrl)" />
+        <ConfigRow Label="Entity ID" Value="@DisplayValue(SamlOptionsAccessor.Value.EntityId)" />
+        <ConfigRow Label="ACS URL" Value="@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)" />
+        <ConfigRow Label="SAML metadata URL" Value="@DisplayValue(SamlOptionsAccessor.Value.MetadataUrl)" />
+        <ConfigRow Label="Identity provider Entity ID" Value="@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)" />
+        <ConfigRow Label="Identity provider login URL" Value="@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderLoginUrl)" />
+    </div>
+</section>
+
+<section class="notice-panel">
+    <div class="notice-icon" aria-hidden="true">i</div>
+    <div>
+        <h3>Manual SAML configuration is the next phase</h3>
+        <p>This project intentionally does not include Microsoft Entra authentication or Sustainsys.Saml2 yet. Add those pieces only after the public connection values have been validated.</p>
+    </div>
+</section>
+
+@code {
+    private static string DisplayValue(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "Not configured" : value;
+}

@@ -1,0 +1,9 @@
+<div class="config-row">
+    <span class="config-label">@Label</span>
+    <span class="config-value @(Value == "Not configured" ? "config-value-muted" : string.Empty)">@Value</span>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Value { get; set; } = string.Empty;
+}

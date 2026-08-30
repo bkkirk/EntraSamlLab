@@ -1,0 +1,66 @@
+@page "/claims"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Claims | Entra SAML Lab</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow accent">Diagnostics</p>
+        <h1>Claims inspector</h1>
+        <p class="page-intro">Review the claims exposed by the current ASP.NET Core ClaimsPrincipal after authentication.</p>
+    </div>
+    <span class="status-badge status-badge-muted"><span class="status-dot"></span> Read-only</span>
+</div>
+
+<section class="panel claims-panel">
+    <div class="panel-heading">
+        <div>
+            <p class="eyebrow">Identity context</p>
+            <h2>ClaimsPrincipal</h2>
+        </div>
+        <span class="claims-count">@ClaimRows.Count claim@(ClaimRows.Count == 1 ? "" : "s")</span>
+    </div>
+
+    @if (ClaimRows.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon" aria-hidden="true">≡</div>
+            <h3>No authenticated user</h3>
+            <p>Claims will appear here after SAML authentication is configured and a user signs in.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="claims-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Claim Type</th>
+                        <th scope="col">Claim Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var claim in ClaimRows)
+                    {
+                        <tr>
+                            <td>@claim.Type</td>
+                            <td>@claim.Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+@code {
+    private List<Claim> ClaimRows { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        ClaimRows = authenticationState.User.Identity?.IsAuthenticated == true
+            ? authenticationState.User.Claims.OrderBy(claim => claim.Type).ToList()
+            : [];
+    }
+}

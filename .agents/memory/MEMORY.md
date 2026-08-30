@@ -1,0 +1,1 @@
+- [Razor component naming](razor-component-naming.md) — avoid member names that collide with the generated component type.

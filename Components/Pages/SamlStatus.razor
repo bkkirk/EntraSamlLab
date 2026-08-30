@@ -10,8 +10,21 @@
         <h1>SAML status</h1>
         <p class="page-intro">Inspect the current authentication session and the service provider connection details.</p>
     </div>
-    <span class="status-badge status-badge-muted"><span class="status-dot"></span> Not authenticated</span>
+    <span class="status-badge @(IsAuthenticated ? "status-badge-ready" : "status-badge-muted")">
+        <span class="status-dot"></span> @AuthenticationStatus
+    </span>
 </div>
+
+@if (!string.IsNullOrWhiteSpace(StatusMessage))
+{
+    <section class="notice-panel">
+        <div class="notice-icon" aria-hidden="true">!</div>
+        <div>
+            <h3>Sign-in is not available yet</h3>
+            <p>@StatusMessage</p>
+        </div>
+    </section>
+}
 
 <div class="status-layout">
     <section class="panel panel-primary-status">
@@ -26,13 +39,14 @@
             <span class="status-ring"></span>
             <div>
                 <strong>@AuthenticationLabel</strong>
-                <p>No SAML session has been established.</p>
+                <p>@AuthenticationDescription</p>
             </div>
         </div>
         <dl class="detail-list">
+            <div><dt>Authentication status</dt><dd>@AuthenticationStatus</dd></div>
             <div><dt>Current signed-in user</dt><dd>@CurrentUser</dd></div>
             <div><dt>Authentication time</dt><dd>@AuthenticationTime</dd></div>
-            <div><dt>Authentication protocol</dt><dd>SAML 2.0</dd></div>
+            <div><dt>Authentication type</dt><dd>@AuthenticationType</dd></div>
         </dl>
     </section>
 
@@ -42,30 +56,66 @@
                 <p class="eyebrow">Connection</p>
                 <h2>Service provider</h2>
             </div>
-            <span class="status-badge status-badge-muted">Pending</span>
+            <span class="status-badge @(HasServiceProviderConfiguration ? "status-badge-ready" : "status-badge-muted")">
+                @(HasServiceProviderConfiguration ? "Ready" : "Incomplete")
+            </span>
         </div>
         <dl class="detail-list">
-            <div><dt>Identity provider</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)</dd></div>
-            <div><dt>Service provider Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.EntityId)</dd></div>
-            <div><dt>Assertion Consumer Service URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)</dd></div>
-            <div><dt>SAML connection status</dt><dd><span class="inline-status"><span class="status-dot"></span> Not configured</span></dd></div>
+            <div><dt>Service Provider status</dt><dd><span class="inline-status"><span class="status-dot"></span> @ServiceProviderStatus</span></dd></div>
+            <div><dt>Public Base URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.PublicBaseUrl)</dd></div>
+            <div><dt>Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.EntityId)</dd></div>
+            <div><dt>ACS URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)</dd></div>
+            <div><dt>SAML Metadata URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.MetadataUrl)</dd></div>
+            <div><dt>Identity Provider configuration status</dt><dd>@IdentityProviderStatus</dd></div>
+            <div><dt>Identity Provider Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)</dd></div>
         </dl>
     </section>
 </div>
 
 @code {
     private string AuthenticationLabel = "Not Authenticated";
+    private string AuthenticationDescription = "No SAML session has been established.";
+    private string AuthenticationStatus = "Not authenticated";
+    private string AuthenticationType = "Not available";
     private string CurrentUser = "None";
     private string AuthenticationTime = "Not available";
+    private string? StatusMessage;
+
+    [SupplyParameterFromQuery(Name = "message")]
+    public string? Message { get; set; }
+
+    private bool IsAuthenticated;
+
+    private bool HasServiceProviderConfiguration =>
+        SamlOptionsAccessor.Value.HasServiceProviderConfiguration;
+
+    private string ServiceProviderStatus =>
+        HasServiceProviderConfiguration ? "Ready for Identity Provider setup" : "Incomplete configuration";
+
+    private string IdentityProviderStatus =>
+        SamlOptionsAccessor.Value.HasIdentityProviderConfiguration
+            ? "Configured"
+            : "Not configured";
 
     protected override async Task OnInitializedAsync()
     {
+        StatusMessage = Message switch
+        {
+            "identity-provider-not-configured" =>
+                "The SAML Service Provider is ready, but Microsoft Entra Identity Provider settings have not been supplied yet.",
+            _ => null
+        };
+
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
 
         if (user.Identity?.IsAuthenticated == true)
         {
+            IsAuthenticated = true;
             AuthenticationLabel = "Authenticated";
+            AuthenticationDescription = "A SAML session has been established for this browser.";
+            AuthenticationStatus = "Authenticated";
+            AuthenticationType = user.Identity.AuthenticationType ?? "Cookie";
             CurrentUser = user.Identity.Name ?? user.FindFirst("name")?.Value ?? "Signed-in user";
 
             var authTime = user.FindFirst("auth_time")?.Value;
@@ -75,6 +125,6 @@
         }
     }
 
-    private static string DisplayValue(string value) =>
+    private static string DisplayValue(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "Not configured" : value;
 }

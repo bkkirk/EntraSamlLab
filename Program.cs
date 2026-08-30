@@ -1,7 +1,13 @@
 using System.Net;
 using EntraSamlLab;
 using EntraSamlLab.Components;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
+using Sustainsys.Saml2;
+using Sustainsys.Saml2.AspNetCore2;
+using Sustainsys.Saml2.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +19,64 @@ builder.Services.Configure<SamlOptions>(
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = Saml2Defaults.Scheme;
+    })
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "EntraSamlLab.Auth";
+        options.LoginPath = "/auth/login";
+        options.LogoutPath = "/auth/logout";
+        options.SlidingExpiration = true;
+    })
+    .AddSaml2(options =>
+    {
+        var saml = builder.Configuration
+            .GetSection(SamlOptions.SectionName)
+            .Get<SamlOptions>() ?? new SamlOptions();
+
+        if (Uri.TryCreate(saml.EntityId, UriKind.Absolute, out var entityId))
+        {
+            options.SPOptions.EntityId = new EntityId(entityId.AbsoluteUri);
+        }
+
+        if (Uri.TryCreate(saml.PublicBaseUrl, UriKind.Absolute, out var publicOrigin))
+        {
+            options.SPOptions.PublicOrigin = publicOrigin;
+        }
+
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.SignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        if (saml.HasIdentityProviderConfiguration &&
+            Uri.TryCreate(saml.IdentityProviderEntityId, UriKind.Absolute, out var identityProviderEntityId))
+        {
+            var identityProvider = new IdentityProvider(
+                new EntityId(identityProviderEntityId.AbsoluteUri),
+                options.SPOptions);
+
+            if (Uri.TryCreate(saml.IdentityProviderLoginUrl, UriKind.Absolute, out var loginUrl))
+            {
+                identityProvider.SingleSignOnServiceUrl = loginUrl;
+            }
+
+            if (Uri.TryCreate(saml.IdentityProviderLogoutUrl, UriKind.Absolute, out var logoutUrl))
+            {
+                identityProvider.SingleLogoutServiceUrl = logoutUrl;
+            }
+
+            if (Uri.TryCreate(saml.IdentityProviderMetadataUrl, UriKind.Absolute, out var metadataUrl))
+            {
+                identityProvider.MetadataLocation = metadataUrl.AbsoluteUri;
+            }
+
+            options.IdentityProviders.Add(identityProvider);
+        }
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -34,8 +97,44 @@ app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Text("EntraSamlLab Healthy", "text/plain"));
+
+app.MapGet("/auth/login", async (
+    HttpContext httpContext,
+    IOptions<SamlOptions> samlOptions,
+    ILoggerFactory loggerFactory) =>
+{
+    var saml = samlOptions.Value;
+    if (!saml.HasIdentityProviderConfiguration)
+    {
+        return Results.Redirect("/saml-status?message=identity-provider-not-configured");
+    }
+
+    try
+    {
+        await httpContext.ChallengeAsync(
+            Saml2Defaults.Scheme,
+            new AuthenticationProperties { RedirectUri = "/" });
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or UriFormatException)
+    {
+        loggerFactory.CreateLogger("SamlLogin").LogWarning(
+            exception,
+            "SAML login was requested but the Identity Provider configuration is incomplete.");
+        return Results.Redirect("/saml-status?message=identity-provider-not-configured");
+    }
+
+    return Results.Empty;
+});
+
+app.MapGet("/auth/logout", async (HttpContext httpContext) =>
+{
+    await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return Results.Redirect("/");
+});
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

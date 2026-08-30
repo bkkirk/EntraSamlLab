@@ -26,22 +26,24 @@
         <ConfigRow Label="Application name" Value="@SamlOptionsAccessor.Value.ApplicationName" />
         <ConfigRow Label="Public base URL" Value="@DisplayValue(SamlOptionsAccessor.Value.PublicBaseUrl)" />
         <ConfigRow Label="Entity ID" Value="@DisplayValue(SamlOptionsAccessor.Value.EntityId)" />
-        <ConfigRow Label="ACS URL" Value="@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)" />
-        <ConfigRow Label="SAML metadata URL" Value="@DisplayValue(SamlOptionsAccessor.Value.MetadataUrl)" />
+        <ConfigRow Label="ACS / Reply URL" Value="@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)" />
+        <ConfigRow Label="Metadata URL" Value="@DisplayValue(SamlOptionsAccessor.Value.MetadataUrl)" />
         <ConfigRow Label="Identity provider Entity ID" Value="@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)" />
         <ConfigRow Label="Identity provider login URL" Value="@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderLoginUrl)" />
+        <ConfigRow Label="Identity provider logout URL" Value="@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderLogoutUrl)" />
+        <ConfigRow Label="Identity provider metadata URL" Value="@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderMetadataUrl)" />
     </div>
 </section>
 
 <section class="notice-panel">
     <div class="notice-icon" aria-hidden="true">i</div>
     <div>
-        <h3>Manual SAML configuration is the next phase</h3>
-        <p>This project intentionally does not include Microsoft Entra authentication or Sustainsys.Saml2 yet. Add those pieces only after the public connection values have been validated.</p>
+            <h3>Microsoft Entra is the next phase</h3>
+            <p>The Service Provider baseline is active, but Microsoft Entra Identity Provider values, metadata, and signing certificate information are intentionally left blank until the next configuration phase.</p>
     </div>
 </section>
 
 @code {
-    private static string DisplayValue(string value) =>
+    private static string DisplayValue(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "Not configured" : value;
 }

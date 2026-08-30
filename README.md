@@ -2,8 +2,8 @@
 
 EntraSamlLab is a .NET 8 Blazor Web App that provides a focused workspace for
 building and validating a Microsoft Entra ID SAML 2.0 Service Provider
-integration. This first version is the base application only: SAML middleware
-and Microsoft Entra authentication are intentionally not configured yet.
+integration. It uses Sustainsys.Saml2 for the SAML Service Provider protocol
+flow and cookie authentication for the local application session.
 
 ## Application purpose
 
@@ -14,6 +14,8 @@ The dashboard provides:
 - A ClaimsPrincipal claims inspector
 - A configuration page for public, non-secret SAML values
 - A plain-text health endpoint at `/health`
+- SAML metadata at `/Saml2`
+- Guarded login at `/auth/login` and local logout at `/auth/logout`
 
 The application uses interactive server rendering and reads SAML settings from
 the `Saml` section in `appsettings.json`.
@@ -79,7 +81,31 @@ Expected response:
 EntraSamlLab Healthy
 ```
 
-## Future SAML configuration
+## SAML Service Provider Configuration
+
+The current Service Provider is configured with these public values:
+
+- **Public URL:** `https://www.bkkirk.com`
+- **Entity ID:** `https://www.bkkirk.com/Saml2`
+- **ACS URL:** `https://www.bkkirk.com/Saml2/Acs`
+- **Metadata URL:** `https://www.bkkirk.com/Saml2`
+
+The Service Provider metadata endpoint is available at `/Saml2`. The local
+login endpoint safely reports that the Identity Provider is not configured
+until the required Microsoft Entra values are supplied.
+
+Microsoft Entra ID is intentionally not configured as the Identity Provider
+yet. It will be added in the next phase. Keep these Identity Provider values
+blank until the Entra tenant details, metadata, and signing certificate
+requirements are available:
+
+- Identity provider Entity ID / issuer
+- Identity provider login URL
+- Identity provider logout URL
+- Federation metadata URL
+- Signing certificate information
+
+## Configuration values
 
 Populate the non-secret values in the `Saml` section of `appsettings.json` or
 an environment-specific configuration source:
@@ -91,7 +117,9 @@ an environment-specific configuration source:
 - SAML metadata URL
 - Identity provider Entity ID
 - Identity provider login URL
+- Identity provider logout URL
+- Identity provider metadata URL
 
 Do not commit passwords, certificates, private keys, tenant secrets, or other
-credentials. Sustainsys.Saml2 is not installed in this baseline and will be
-added only after the base application has been validated.
+credentials. The application never displays secret or certificate material in
+the Configuration page.

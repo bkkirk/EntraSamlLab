@@ -1,0 +1,164 @@
+Update the existing .NET 8 ASP.NET Core Blazor Web App named EntraSamlLab to add SAML 2.0 Service Provider support using Sustainsys.Saml2.AspNetCore2.
+
+Important:
+- This app is already running successfully in Docker on an Ubuntu server.
+- The public HTTPS URL is:
+  https://www.bkkirk.com
+- Caddy terminates HTTPS and reverse-proxies traffic to the Docker container on port 8080.
+- Do not remove or break the existing Docker, health endpoint, dashboard, or forwarded-header configuration.
+- Do not add Microsoft Entra-specific tenant values yet.
+- Do not hard-code secrets, certificates, tenant IDs, or credentials.
+
+Requirements:
+
+1. Add the NuGet package:
+   Sustainsys.Saml2.AspNetCore2
+
+2. Configure ASP.NET Core authentication to use:
+   - Cookie authentication for the local authenticated session
+   - Sustainsys SAML2 as the authentication challenge scheme
+
+3. Use these Service Provider values:
+
+   Public Base URL:
+   https://www.bkkirk.com
+
+   Entity ID:
+   https://www.bkkirk.com/Saml2
+
+   ACS / Reply URL:
+   https://www.bkkirk.com/Saml2/Acs
+
+4. Keep the existing forwarded-header configuration so ASP.NET Core recognizes the external HTTPS scheme behind Caddy.
+
+5. Add authentication middleware in the correct order:
+   - UseForwardedHeaders
+   - UseAuthentication
+   - UseAuthorization
+
+6. Configure Sustainsys SPOptions with:
+   EntityId = https://www.bkkirk.com/Saml2
+
+7. Do not configure the Microsoft Entra Identity Provider yet.
+   Leave clear configuration placeholders for:
+   - Identity Provider Entity ID / Issuer
+   - Login URL
+   - Logout URL
+   - Federation Metadata URL
+   - Signing certificate information
+
+8. Store non-secret SAML settings in appsettings.json under a Saml section.
+
+Use or update this structure:
+
+"Saml": {
+  "ApplicationName": "Entra SAML Lab",
+  "PublicBaseUrl": "https://www.bkkirk.com",
+  "EntityId": "https://www.bkkirk.com/Saml2",
+  "AcsUrl": "https://www.bkkirk.com/Saml2/Acs",
+  "MetadataUrl": "https://www.bkkirk.com/Saml2",
+  "IdentityProviderEntityId": "",
+  "IdentityProviderLoginUrl": "",
+  "IdentityProviderLogoutUrl": "",
+  "IdentityProviderMetadataUrl": ""
+}
+
+9. Add a login endpoint or action that explicitly challenges the SAML2 authentication scheme.
+
+The existing "Sign in with Microsoft Entra ID" button should initiate the SAML authentication challenge.
+
+If the Identity Provider is not yet configured, handle that gracefully and display a clear message instead of crashing the application.
+
+10. Add a logout endpoint or action that:
+   - signs the user out of the local authentication cookie
+   - returns the user to the application home page
+
+Full Entra SAML Single Logout does not need to be implemented yet.
+
+11. Update the existing SAML Status page so it displays:
+
+   Authentication Status
+   Service Provider Status
+   Public Base URL
+   Entity ID
+   ACS URL
+   SAML Metadata URL
+   Identity Provider Configuration Status
+   Current Signed-In User
+   Authentication Type
+
+12. Update the Configuration page so it clearly shows:
+
+   Application Name
+   Public Base URL
+   Entity ID
+   ACS / Reply URL
+   Metadata URL
+   Identity Provider Entity ID
+   Identity Provider Login URL
+   Identity Provider Logout URL
+   Identity Provider Metadata URL
+
+Do not display secrets.
+
+13. Keep the Claims page.
+When authenticated, enumerate all claims from User.Claims.
+Display:
+   Claim Type
+   Claim Value
+
+14. Protect against null or incomplete SAML configuration.
+The application must still start and load normally before the Entra Identity Provider is configured.
+
+15. Preserve the existing /health endpoint:
+   GET /health
+   Response:
+   EntraSamlLab Healthy
+
+16. Verify the application builds successfully using:
+
+   dotnet restore
+   dotnet build
+
+17. Verify Docker still builds successfully.
+
+18. Do not change the public listening port.
+The application must continue listening on port 8080 in the container.
+
+19. Update README.md with a section titled:
+   SAML Service Provider Configuration
+
+Document:
+   Public URL
+   Entity ID
+   ACS URL
+   Metadata URL
+   current configuration status
+   that Microsoft Entra ID will be added as the Identity Provider in the next phase
+
+20. After making the changes:
+   - fix all compile errors
+   - run the application
+   - verify /health works
+   - verify the home page loads
+   - verify the SAML Status page loads
+   - verify the Configuration page loads
+   - verify clicking Sign in does not crash the app before the IdP is configured
+
+21. Do not guess Entra tenant-specific values.
+
+22. At completion, show me:
+   - NuGet packages added
+   - files modified
+   - relevant Program.cs authentication configuration
+   - relevant appsettings.json SAML section
+   - SAML routes/endpoints
+   - Docker build result
+   - dotnet build result
+   - any warnings or limitations
+
+23. Commit all changes to the connected GitHub repository with this commit message:
+
+   Add Sustainsys SAML service provider support
+
+24. Push the commit to GitHub.

@@ -1,22 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --ink: #182235;
-    --muted: #687389;
-    --muted-soft: #91a0b6;
-    --line: #e4e9f0;
-    --canvas: #f6f8fb;
-    --surface: #ffffff;
-    --navy: #111b32;
+    color-scheme: dark;
+    --ink: #f3f6ff;
+    --muted: #b4bfd3;
+    --muted-soft: #8f9db6;
+    --line: #2b3852;
+    --canvas: #0b1120;
+    --surface: #121c31;
+    --navy: #080e1d;
     --navy-soft: #1b2743;
-    --violet: #6d5dfc;
-    --violet-soft: #eeecff;
-    --cyan: #39c7d9;
-    --cyan-soft: #e5f9fb;
-    --amber: #eba84b;
-    --amber-soft: #fff4df;
-    --green: #3dba83;
-    --green-soft: #e7f8ef;
+    --violet: #a69cff;
+    --violet-soft: #27234f;
+    --cyan: #5fe4ed;
+    --cyan-soft: #153e48;
+    --amber: #f4c46f;
+    --amber-soft: #483618;
+    --green: #63d9a0;
+    --green-soft: #173d2d;
     font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--ink);
     background: var(--canvas);
@@ -213,7 +214,7 @@ a:focus-visible {
     justify-content: space-between;
     padding: 0 clamp(24px, 4vw, 58px);
     border-bottom: 1px solid var(--line);
-    background: rgba(255,255,255,.72);
+    background: rgba(18,28,49,.88);
 }
 
 .topbar .eyebrow {
@@ -232,10 +233,10 @@ a:focus-visible {
     align-items: center;
     gap: 8px;
     padding: 7px 11px;
-    border: 1px solid #dce3eb;
+    border: 1px solid #34425d;
     border-radius: 99px;
-    background: #fbfcfd;
-    color: #66758d;
+    background: #18243c;
+    color: #c3cde0;
     font-size: 11px;
     font-weight: 700;
 }
@@ -287,6 +288,10 @@ p {
     margin-top: 0;
 }
 
+h1:focus {
+    outline: none;
+}
+
 h1 {
     margin-bottom: 10px;
     color: var(--ink);
@@ -334,15 +339,15 @@ h3 {
 }
 
 .status-badge-muted {
-    border-color: #e0e5ed;
-    background: #f4f6f9;
-    color: #78869b;
+    border-color: #35435e;
+    background: #1a263d;
+    color: #c3cde0;
 }
 
 .status-badge-ready {
-    border-color: #c7edda;
+    border-color: #2e7658;
     background: var(--green-soft);
-    color: #2c9769;
+    color: #7ce0ae;
 }
 
 .hero-panel {
@@ -388,7 +393,7 @@ h3 {
 
 .hero-copy h2 {
     margin-bottom: 10px;
-    color: #ffffff;
+    color: #f8faff;
     font-size: clamp(25px, 3vw, 33px);
     letter-spacing: -.055em;
 }
@@ -396,7 +401,7 @@ h3 {
 .hero-copy p {
     max-width: 530px;
     margin-bottom: 25px;
-    color: #a8b2c8;
+    color: #c6d0e1;
     font-size: 13px;
     line-height: 1.65;
 }
@@ -416,7 +421,7 @@ h3 {
 }
 
 .button-primary {
-    background: #6d5dfc;
+    background: #7568ff;
     box-shadow: 0 9px 17px rgba(83, 70, 222, .24);
     color: white;
 }
@@ -428,7 +433,7 @@ h3 {
 
 .button-note {
     margin-left: 12px;
-    color: #7f8ca6;
+    color: #aebbd0;
     font-size: 11px;
 }
 
@@ -564,8 +569,8 @@ h3 {
 }
 
 .icon-violet { background: var(--violet-soft); color: var(--violet); }
-.icon-cyan { background: var(--cyan-soft); color: #24a6b6; }
-.icon-amber { background: var(--amber-soft); color: #d48c25; }
+.icon-cyan { background: var(--cyan-soft); color: var(--cyan); }
+.icon-amber { background: var(--amber-soft); color: var(--amber); }
 
 .card-label {
     margin-bottom: 5px;
@@ -633,18 +638,18 @@ h3 {
     gap: 15px;
     margin-bottom: 25px;
     padding: 16px;
-    border: 1px solid #e2e5ff;
+    border: 1px solid #403a78;
     border-radius: 9px;
-    background: #f8f7ff;
+    background: #1b1936;
 }
 
 .status-ring {
     display: block;
     width: 12px;
     height: 12px;
-    border: 3px solid #b8b0ff;
+    border: 3px solid #aaa0ff;
     border-radius: 50%;
-    box-shadow: 0 0 0 4px #e9e6ff;
+    box-shadow: 0 0 0 4px #312d62;
 }
 
 .status-callout strong {
@@ -672,7 +677,7 @@ h3 {
     justify-content: space-between;
     gap: 22px;
     padding: 13px 0;
-    border-top: 1px solid #edf0f4;
+    border-top: 1px solid #293750;
 }
 
 .detail-list dt {
@@ -695,7 +700,7 @@ h3 {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    color: #9a6a25;
+    color: var(--amber);
     font-family: inherit;
     font-size: inherit;
 }
@@ -722,9 +727,9 @@ h3 {
     place-items: center;
     align-content: center;
     padding: 30px;
-    border: 1px dashed #dfe4ec;
+    border: 1px dashed #3a4964;
     border-radius: 9px;
-    background: #fbfcfd;
+    background: #0e1729;
     text-align: center;
 }
 
@@ -765,7 +770,7 @@ h3 {
 
 .claims-table th {
     padding: 12px 15px;
-    background: #f8f9fb;
+    background: #17233a;
     color: var(--muted-soft);
     font-family: 'DM Mono', monospace;
     font-size: 10px;
@@ -805,8 +810,8 @@ code,
 code {
     padding: 2px 5px;
     border-radius: 4px;
-    background: #f0efff;
-    color: #5b4fe0;
+    background: #27234f;
+    color: #c1baff;
     font-size: .9em;
 }
 
@@ -846,9 +851,9 @@ code {
     gap: 15px;
     margin-top: 17px;
     padding: 21px 24px;
-    border: 1px solid #f2dfb9;
+    border: 1px solid #66512c;
     border-radius: 12px;
-    background: #fffbf2;
+    background: #211b10;
 }
 
 .notice-icon {
@@ -857,9 +862,9 @@ code {
     height: 27px;
     flex: none;
     place-items: center;
-    border: 1px solid #eabd70;
+    border: 1px solid #c99545;
     border-radius: 50%;
-    color: #b77c22;
+    color: var(--amber);
     font-family: Georgia, serif;
     font-size: 16px;
     font-weight: 700;
@@ -872,7 +877,7 @@ code {
 
 .notice-panel p {
     margin-bottom: 0;
-    color: #806d50;
+    color: #d0b982;
     font-size: 11px;
     line-height: 1.7;
 }
@@ -886,11 +891,11 @@ code {
     align-items: center;
     gap: 15px;
     padding: 13px 16px;
-    border: 1px solid #f0c1c1;
+    border: 1px solid #7a3e4a;
     border-radius: 8px;
-    background: #fff7f7;
+    background: #2b1720;
     box-shadow: 0 8px 20px rgba(80, 20, 20, .1);
-    color: #9f3838;
+    color: #ff9da9;
     font-size: 12px;
 }
 

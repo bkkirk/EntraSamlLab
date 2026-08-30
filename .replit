@@ -1,0 +1,32 @@
+modules = ["dotnet-8.0"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "EntraSamlLab"
+
+[[workflows.workflow]]
+name = "EntraSamlLab"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "dotnet run --no-launch-profile --project EntraSamlLab.csproj"
+waitForPort = 8080
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[agent]
+expertMode = true

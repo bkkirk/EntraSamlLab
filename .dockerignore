@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+.git/
+.gitignore
+.local/
+.cache/
+.conversation/
+.vscode/
+.idea/
+README.md
+Dockerfile
+*.user
+*.suo

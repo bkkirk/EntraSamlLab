@@ -50,6 +50,29 @@ builder.Services.AddAuthentication(options =>
 
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.SignOutScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.Events = new RemoteAuthenticationEvents
+        {
+            OnRemoteFailure = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("SamlAuthentication");
+
+                logger.LogError(
+                    context.Failure,
+                    "SAML authentication failed during the remote callback. " +
+                    "Check the Entra entity ID, reply URL, audience, federation metadata, " +
+                    "signing certificate, NameID, and SAML response.");
+
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.Redirect("/saml-status?message=saml-authentication-failed");
+                    context.HandleResponse();
+                }
+
+                return Task.CompletedTask;
+            }
+        };
 
         if (saml.HasIdentityProviderConfiguration &&
             Uri.TryCreate(saml.IdentityProviderEntityId, UriKind.Absolute, out var identityProviderEntityId))
@@ -125,6 +148,13 @@ app.MapGet("/auth/login", async (
             exception,
             "SAML login was requested but the Identity Provider configuration is incomplete.");
         return Results.Redirect("/saml-status?message=identity-provider-not-configured");
+    }
+    catch (Exception exception)
+    {
+        loggerFactory.CreateLogger("SamlLogin").LogError(
+            exception,
+            "SAML login challenge failed before the remote authentication flow started.");
+        return Results.Redirect("/saml-status?message=saml-authentication-failed");
     }
 
     return Results.Empty;

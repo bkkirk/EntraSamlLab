@@ -66,8 +66,11 @@
             <div><dt>Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.EntityId)</dd></div>
             <div><dt>ACS URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.AcsUrl)</dd></div>
             <div><dt>SAML Metadata URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.MetadataUrl)</dd></div>
-            <div><dt>Identity Provider configuration status</dt><dd>@IdentityProviderStatus</dd></div>
-            <div><dt>Identity Provider Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)</dd></div>
+            <div><dt>Identity Provider status</dt><dd>@IdentityProviderStatus</dd></div>
+            <div><dt>IdP Entity ID</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderEntityId)</dd></div>
+            <div><dt>IdP Login URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderLoginUrl)</dd></div>
+            <div><dt>IdP Logout URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderLogoutUrl)</dd></div>
+            <div><dt>IdP Federation Metadata URL</dt><dd>@DisplayValue(SamlOptionsAccessor.Value.IdentityProviderMetadataUrl)</dd></div>
         </dl>
     </section>
 </div>
@@ -103,6 +106,8 @@
         {
             "identity-provider-not-configured" =>
                 "The SAML Service Provider is ready, but Microsoft Entra Identity Provider settings have not been supplied yet.",
+            "saml-authentication-failed" =>
+                "Microsoft Entra returned an authentication failure. Review the application logs for protocol and validation details.",
             _ => null
         };
 

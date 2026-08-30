@@ -90,20 +90,25 @@ The current Service Provider is configured with these public values:
 - **ACS URL:** `https://www.bkkirk.com/Saml2/Acs`
 - **Metadata URL:** `https://www.bkkirk.com/Saml2`
 
-The Service Provider metadata endpoint is available at `/Saml2`. The local
-login endpoint safely reports that the Identity Provider is not configured
-until the required Microsoft Entra values are supplied.
+The Service Provider metadata endpoint is available at `/Saml2`. Microsoft
+Entra ID is configured as the Identity Provider using the application-specific
+federation metadata URL and the tenant's SAML endpoints. Sustainsys uses the
+federation metadata to discover and validate the current Entra signing
+certificate; no downloaded certificate is embedded in the application.
 
-Microsoft Entra ID is intentionally not configured as the Identity Provider
-yet. It will be added in the next phase. Keep these Identity Provider values
-blank until the Entra tenant details, metadata, and signing certificate
-requirements are available:
+The configured Identity Provider values are:
 
-- Identity provider Entity ID / issuer
-- Identity provider login URL
-- Identity provider logout URL
-- Federation metadata URL
-- Signing certificate information
+- **Entity ID / issuer:** `https://sts.windows.net/0561ec8f-2290-4f1f-8433-04350e745711/`
+- **Login URL:** `https://login.microsoftonline.com/0561ec8f-2290-4f1f-8433-04350e745711/saml2`
+- **Logout URL:** `https://login.microsoftonline.com/0561ec8f-2290-4f1f-8433-04350e745711/saml2`
+- **Federation metadata URL:** `https://login.microsoftonline.com/0561ec8f-2290-4f1f-8433-04350e745711/federationmetadata/2007-06/federationmetadata.xml?appid=11e77e71-d253-42a7-a265-cca453fe7623`
+
+The `/auth/login` endpoint starts a SAML challenge when the IdP configuration
+is complete. Successful responses establish the local cookie session and
+return the user to the dashboard. Remote failures are logged with diagnostic
+context and redirect to `/saml-status?message=saml-authentication-failed`
+without displaying raw SAML responses or tokens. `/auth/logout` clears the
+local cookie session and returns to the dashboard.
 
 ## Configuration values
 
@@ -122,4 +127,14 @@ an environment-specific configuration source:
 
 Do not commit passwords, certificates, private keys, tenant secrets, or other
 credentials. The application never displays secret or certificate material in
-the Configuration page.
+the Configuration page. Signature, audience, and certificate validation remain
+enabled by default.
+
+## Authentication diagnostics
+
+If Entra authentication fails, inspect the application logs for the SAML
+failure record. The diagnostic message points toward the common integration
+checks: Entity ID and reply URL matching, audience validation, federation
+metadata and signing-certificate validation, NameID presence, and SAML
+response validity. Interactive sign-in must be validated from the deployed
+public HTTPS URL; it is not performed from the Replit environment.
